@@ -57,7 +57,7 @@ pointLightFolder.add(pointLight.position, 'z', -10, 10, 0.01)
 const rectAreaLight = new THREE.RectAreaLight(0x4e00ff, 1, 1, 1)
 rectAreaLight.position.set(-1.5, 0, 1.5)
 rectAreaLight.lookAt(new THREE.Vector3()) // Looking at the center (0,0,0)
-scene.add(rectAreaLight)
+// scene.add(rectAreaLight)
 
 // RectAreaLight only works with MeshStandardMaterial and MeshPhysicalMaterial
 const rectAreaLightFolder = gui.addFolder('RectAreaLight')
@@ -67,6 +67,18 @@ rectAreaLightFolder.add(rectAreaLight, 'width', 1, 10, 0.01)
 rectAreaLightFolder.add(rectAreaLight.position, 'x', -10, 10, 0.01)
 rectAreaLightFolder.add(rectAreaLight.position, 'y', -10, 10, 0.01)
 rectAreaLightFolder.add(rectAreaLight.position, 'z', -10, 10, 0.01)
+
+const spotLight = new THREE.SpotLight(0x78ff00, 0.5, 10, Math.PI * 0.1, 0.25, 1)
+spotLight.position.set(0, 2, 3)
+// const spotLightHelper = new THREE.SpotLightHelper(spotLight)
+scene.add(spotLight)
+
+const spotLightFolder = gui.addFolder('SpotLight')
+spotLightFolder.add(spotLight, 'angle', -1, 1, 0.01)
+spotLightFolder.add(spotLight, 'penumbra', -1, 1, 0.01)
+spotLightFolder.add(spotLight.position, 'x', -10, 10, 0.01)
+spotLightFolder.add(spotLight.position, 'y', -10, 10, 0.01)
+spotLightFolder.add(spotLight.position, 'z', -10, 10, 0.01)
 
 /**
  * Objects
