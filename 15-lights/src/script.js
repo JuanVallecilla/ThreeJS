@@ -18,20 +18,27 @@ const scene = new THREE.Scene()
  * Lights
  */
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-scene.add(ambientLight)
+// scene.add(ambientLight)
 
 const ambientLightFolder = gui.addFolder('Ambient Light')
 ambientLightFolder.add(ambientLight, 'intensity', 0, 1, 0.01)
 
 const directionalLight = new THREE.DirectionalLight(0x00fffc, 0.3)
 directionalLight.position.set(1, 0.25, 0)
-scene.add(directionalLight)
+// scene.add(directionalLight)
 
 const directionalLightFolder = gui.addFolder('Directional Light')
 directionalLightFolder.add(directionalLight, 'intensity', 0, 1, 0.01)
 directionalLightFolder.add(directionalLight.position, 'x', -1, 1, 0.01)
 directionalLightFolder.add(directionalLight.position, 'y', 0, 1, 0.01)
 directionalLightFolder.add(directionalLight.position, 'z', -1, 1, 0.01)
+
+const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x000fff)
+scene.add(hemisphereLight)
+
+const hemisphereLightFolder = gui.addFolder('Hemisphere Light')
+hemisphereLightFolder.add(hemisphereLight, 'intensity', 0, 1, 0.01)
+hemisphereLightFolder.add(hemisphereLight.position, 'y', -1, 1, 0.01)
 
 /**
  * Objects
