@@ -18,12 +18,12 @@ const scene = new THREE.Scene()
  * Lights
  */
 // Ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.4)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.3)
 gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001)
 scene.add(ambientLight)
 
 // Directional light
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4)
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3)
 
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.width = 1024
@@ -50,7 +50,7 @@ scene.add(directionalLightCameraHelper)
 directionalLightCameraHelper.visible = false
 
 // SpotLight
-const spotLight = new THREE.SpotLight(0xffffff, 0.4, 10, Math.PI * 0.3)
+const spotLight = new THREE.SpotLight(0xffffff, 0.3, 10, Math.PI * 0.3)
 
 spotLight.castShadow = true
 spotLight.shadow.mapSize.width = 1024
@@ -65,6 +65,22 @@ scene.add(spotLight.target)
 
 const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera)
 scene.add(spotLightCameraHelper)
+spotLightCameraHelper.visible = false
+
+// PointLight
+const pointLight = new THREE.PointLight(0xffffff, 0.3)
+
+pointLight.castShadow = true
+pointLight.shadow.mapSize.width = 1024
+pointLight.shadow.mapSize.height = 1024
+pointLight.shadow.camera.near = 0.1
+pointLight.shadow.camera.far = 5
+pointLight.position.set(-1, 1, 0)
+scene.add(pointLight)
+
+const pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
+scene.add(pointLightCameraHelper)
+pointLightCameraHelper.visible = false
 
 /**
  * Materials
