@@ -1,10 +1,17 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'lil-gui'
+/**
+ * Texture
+ */
+
+const textureLoader = new THREE.TextureLoader()
+const bakedShadow = textureLoader.load('./textures/bakedShadow.jpg')
 
 /**
  * Base
  */
+
 // Debug
 const gui = new dat.GUI()
 
@@ -17,6 +24,7 @@ const scene = new THREE.Scene()
 /**
  * Lights
  */
+
 // Ambient light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.3)
 gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001)
@@ -25,7 +33,7 @@ scene.add(ambientLight)
 // Directional light
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3)
 
-directionalLight.castShadow = true
+directionalLight.castShadow = false
 directionalLight.shadow.mapSize.width = 1024
 directionalLight.shadow.mapSize.height = 1024
 directionalLight.shadow.camera.near = 1
@@ -52,7 +60,7 @@ directionalLightCameraHelper.visible = false
 // SpotLight
 const spotLight = new THREE.SpotLight(0xffffff, 0.3, 10, Math.PI * 0.3)
 
-spotLight.castShadow = true
+spotLight.castShadow = false
 spotLight.shadow.mapSize.width = 1024
 spotLight.shadow.mapSize.height = 1024
 spotLight.shadow.camera.fov = 30
@@ -70,7 +78,7 @@ spotLightCameraHelper.visible = false
 // PointLight
 const pointLight = new THREE.PointLight(0xffffff, 0.3)
 
-pointLight.castShadow = true
+pointLight.castShadow = false
 pointLight.shadow.mapSize.width = 1024
 pointLight.shadow.mapSize.height = 1024
 pointLight.shadow.camera.near = 0.1
@@ -96,7 +104,12 @@ gui.add(material, 'roughness').min(0).max(1).step(0.001)
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material)
 sphere.castShadow = true
 
-const plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), material)
+const plane = new THREE.Mesh(
+  new THREE.PlaneGeometry(5, 5),
+  new THREE.MeshBasicMaterial({
+    map: bakedShadow
+  })
+)
 plane.rotation.x = -Math.PI * 0.5
 plane.position.y = -0.5
 plane.receiveShadow = true
