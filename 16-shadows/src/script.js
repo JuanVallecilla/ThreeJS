@@ -6,7 +6,8 @@ import * as dat from 'lil-gui'
  */
 
 const textureLoader = new THREE.TextureLoader()
-const bakedShadow = textureLoader.load('./textures/bakedShadow.jpg')
+// const bakedShadow = textureLoader.load('./textures/bakedShadow.jpg')
+const simpleShadow = textureLoader.load('./textures/simpleShadow.jpg')
 
 /**
  * Base
@@ -104,16 +105,24 @@ gui.add(material, 'roughness').min(0).max(1).step(0.001)
 const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 32), material)
 sphere.castShadow = true
 
-const plane = new THREE.Mesh(
-  new THREE.PlaneGeometry(5, 5),
-  new THREE.MeshBasicMaterial({
-    map: bakedShadow
-  })
-)
+const plane = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), material)
 plane.rotation.x = -Math.PI * 0.5
 plane.position.y = -0.5
 plane.receiveShadow = true
 scene.add(sphere, plane)
+
+const sphereShadow = new THREE.Mesh(
+  new THREE.PlaneGeometry(1.5, 1.5),
+  new THREE.MeshBasicMaterial({
+    color: 0x000000,
+    alphaMap: simpleShadow,
+    transparent: true
+  })
+)
+sphereShadow.rotation.x = -Math.PI * 0.5
+sphereShadow.position.y = plane.position.y + 0.01
+
+scene.add(sphereShadow)
 
 /**
  * Sizes
@@ -167,10 +176,20 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap
  * Animate
  */
 
-// const clock = new THREE.Clock()
+const clock = new THREE.Clock()
 
 const tick = () => {
-  //   const elapsedTime = clock.getElapsedTime()
+  const elapsedTime = clock.getElapsedTime()
+
+  // update sphere
+  sphere.position.x = Math.cos(elapsedTime) * 1.5
+  sphere.position.y = Math.abs(Math.sin(elapsedTime * 3))
+  sphere.position.z = Math.sin(elapsedTime) * 1.5
+
+  // update shadow
+  sphereShadow.position.x = sphere.position.x
+  sphereShadow.material.opacity = (1 - sphere.position.y) * 0.5
+  sphereShadow.position.z = sphere.position.z
 
   // Update controls
   controls.update()
