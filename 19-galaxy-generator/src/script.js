@@ -1,12 +1,17 @@
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import * as dat from 'lil-gui'
+// import * as dat from 'lil-gui'
+import { Pane } from 'tweakpane'
 
 /**
  * Base
  */
+
 // Debug
-const gui = new dat.GUI()
+// const gui = new dat.GUI()
+const pane = new Pane({
+  title: 'Parameters'
+})
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -15,11 +20,15 @@ const canvas = document.querySelector('canvas.webgl')
 const scene = new THREE.Scene()
 
 const parameters = {
-  count: 100000,
+  count: 30000,
   size: 0.01,
   radius: 5,
   branches: 3,
-  spin: 1
+  spin: 1,
+  randomness: 0.2,
+  randomnessPower: 3,
+  insideColor: '#ff6030',
+  outsideColor: '#1b3984'
 }
 
 /**
@@ -41,8 +50,11 @@ const generateGalaxy = () => {
     material.dispose()
     scene.remove(points)
   }
+
   geometry = new THREE.BufferGeometry()
+
   const positions = new Float32Array(parameters.count * 3)
+  const colors = new Float32Array(parameters.count * 3)
 
   for (let i = 0; i < parameters.count; i++) {
     const i3 = i * 3
@@ -51,12 +63,42 @@ const generateGalaxy = () => {
     const branchAngle = ((i % parameters.branches) / parameters.branches) * Math.PI * 2
     const spinAngle = radius * parameters.spin
 
-    positions[i3] = Math.cos(branchAngle + spinAngle) * radius
-    positions[i3 + 1] = 0
-    positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius
+    // Colors
+    const colorInside = new THREE.Color(parameters.insideColor)
+    const colorOutside = new THREE.Color(parameters.outsideColor)
+
+    const mixedColor = colorInside.clone()
+    mixedColor.lerp(colorOutside, radius / parameters.radius)
+
+    colors[i3] = mixedColor.r
+    colors[i3 + 1] = mixedColor.g
+    colors[i3 + 2] = mixedColor.b
+
+    // Adding randomness for all directions
+    const randomX =
+      Math.pow(Math.random(), parameters.randomnessPower) *
+      (Math.random() < 0.5 ? 1 : -1) *
+      parameters.randomness *
+      radius
+    const randomY =
+      Math.pow(Math.random(), parameters.randomnessPower) *
+      (Math.random() < 0.5 ? 1 : -1) *
+      parameters.randomness *
+      radius
+    const randomZ =
+      Math.pow(Math.random(), parameters.randomnessPower) *
+      (Math.random() < 0.5 ? 1 : -1) *
+      parameters.randomness *
+      radius
+
+    positions[i3] = Math.cos(branchAngle + spinAngle) * radius + randomX
+    positions[i3 + 1] = randomY
+    positions[i3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  geometry.setAttribute('spin', new THREE.BufferAttribute(positions, 1))
+  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
 
   /**
    * Material
@@ -65,7 +107,8 @@ const generateGalaxy = () => {
     size: parameters.size,
     sizeAttenuation: true,
     depthWrite: false,
-    blending: THREE.AdditiveBlending
+    blending: THREE.AdditiveBlending,
+    vertexColors: true
   })
 
   /**
@@ -77,11 +120,71 @@ const generateGalaxy = () => {
 
 generateGalaxy()
 
-gui.add(parameters, 'count', 100, 1000000, 100).onFinishChange(generateGalaxy)
-gui.add(parameters, 'size', 0.001, 0.1, 0.001).onFinishChange(generateGalaxy)
-gui.add(parameters, 'radius', 0.01, 20, 0.01).onFinishChange(generateGalaxy)
-gui.add(parameters, 'branches', 2, 20, 1).onFinishChange(generateGalaxy)
-gui.add(parameters, 'spin', -5, 5, 0.001).onFinishChange(generateGalaxy)
+// gui.add(parameters, 'count', 100, 1000000, 100).onFinishChange(generateGalaxy)
+// gui.add(parameters, 'size', 0.001, 0.1, 0.001).onFinishChange(generateGalaxy)
+// gui.add(parameters, 'radius', 0.01, 20, 0.01).onFinishChange(generateGalaxy)
+// gui.add(parameters, 'branches', 2, 20, 1).onFinishChange(generateGalaxy)
+// gui.add(parameters, 'spin', -5, 5, 0.001).onFinishChange(generateGalaxy)
+// gui.add(parameters, 'randomness', 0, 2, 0.001).onFinishChange(generateGalaxy)
+// gui.add(parameters, 'randomnessPower', 1, 10, 0.001).onFinishChange(generateGalaxy)
+
+pane
+  .addInput(parameters, 'count', {
+    min: 0,
+    max: 100000,
+    step: 100
+  })
+  .on('change', generateGalaxy)
+
+pane
+  .addInput(parameters, 'size', {
+    min: 0.001,
+    max: 0.1,
+    step: 0.001
+  })
+  .on('change', generateGalaxy)
+
+pane
+  .addInput(parameters, 'radius', {
+    min: 0.01,
+    max: 20,
+    step: 0.001
+  })
+  .on('change', generateGalaxy)
+
+pane
+  .addInput(parameters, 'branches', {
+    min: 2,
+    max: 20,
+    step: 1
+  })
+  .on('change', generateGalaxy)
+
+pane
+  .addInput(parameters, 'spin', {
+    min: -5,
+    max: 5,
+    step: 0.001
+  })
+  .on('change', generateGalaxy)
+pane
+  .addInput(parameters, 'randomness', {
+    min: 0,
+    max: 2,
+    step: 0.001
+  })
+  .on('change', generateGalaxy)
+pane
+  .addInput(parameters, 'randomnessPower', {
+    min: 1,
+    max: 10,
+    step: 0.001
+  })
+  .on('change', generateGalaxy)
+
+pane.addInput(parameters, 'insideColor').on('change', generateGalaxy)
+
+pane.addInput(parameters, 'outsideColor').on('change', generateGalaxy)
 
 /**
  * Sizes
@@ -123,7 +226,7 @@ controls.enableDamping = true
  * Renderer
  */
 const renderer = new THREE.WebGLRenderer({
-  canvas: canvas
+  canvas
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -138,6 +241,9 @@ const tick = () => {
 
   // Update controls
   controls.update()
+
+  // rotate galaxy on y axis
+  points.rotation.y = elapsedTime * 0.1
 
   // Render
   renderer.render(scene, camera)

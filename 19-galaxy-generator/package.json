@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "standard": "^17.1.0",
+    "tweakpane": "^3.1.9",
     "vite": "^4.0.4"
   },
   "dependencies": {
