@@ -12,6 +12,7 @@ const parameters = {
 
 gui.addColor(parameters, 'materialColor').onChange(() => {
   material.color.set(parameters.materialColor)
+  particleMaterial.color.set(parameters.materialColor)
 })
 
 /**
@@ -62,6 +63,34 @@ mesh3.position.x = 2
 scene.add(mesh1, mesh2, mesh3)
 
 const sectionMeshes = [mesh1, mesh2, mesh3]
+
+/**
+ * Particles
+ */
+// Geometry
+const particleCount = 200
+const positions = new Float32Array(particleCount * 3)
+
+for (let i = 0; i < particleCount; i++) {
+  positions[i * 3] = (Math.random() - 0.5) * 10 // x
+  positions[i * 3 + 1] =
+    objectDistance * 0.5 - Math.random() * objectDistance * sectionMeshes.length // y
+  positions[i * 3 + 2] = (Math.random() - 0.5) * 10 // z
+}
+
+const particleGeometry = new THREE.BufferGeometry()
+particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+
+// Material
+const particleMaterial = new THREE.PointsMaterial({
+  color: parameters.materialColor,
+  sizeAttenuation: true,
+  size: 0.02
+})
+
+// Points
+const particles = new THREE.Points(particleGeometry, particleMaterial)
+scene.add(particles)
 
 /**
  * Sizes
